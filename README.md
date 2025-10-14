@@ -8,7 +8,7 @@ An interactive, fully client-side visual narrative that overlays historic market
 
 ## Features
 
-- **Triple-layer storytelling** – Events, macro indicators, and market indices share a synchronized time axis, zoom level, and crosshair.
+- **Unified storytelling canvas** – Events, macro indicators, and market indices now stack on a single synchronized timeline with shared zoom and crosshair.
 - **Daily automation** – A GitHub Actions workflow fetches Yahoo Finance and FRED data each morning at 09:30 Asia/Taipei (01:30 UTC) and deploys the refreshed site.
 - **Graceful fallbacks** – Sample JSON datasets are bundled; if live fetches fail the interface notifies the viewer and loads cached data.
 - **Theme-aware UI** – Tailwind + custom CSS variables support light/dark themes with automatic detection and a manual override.
@@ -27,7 +27,8 @@ An interactive, fully client-side visual narrative that overlays historic market
 │  ├─ macro.json
 │  └─ events.json
 ├─ scripts/
-│  └─ fetch_data.py      # Data ingestion script (Yahoo, FRED, YAML events)
+│  ├─ fetch_data.py      # Data ingestion script (Yahoo, FRED, YAML events)
+│  └─ generate_sample_data.py  # Deterministic offline fallback generator
 ├─ events.yaml           # Source of curated events (any language)
 ├─ requirements.txt      # Python dependencies for the fetch script
 ├─ .github/workflows/
@@ -54,6 +55,8 @@ An interactive, fully client-side visual narrative that overlays historic market
    ```
 
    The script writes JSON to both `data/` and `site/data/`. If translations are needed for non-English event titles, the script attempts automatic translation (via Google Translate). Provide `title_en` / `brief_en` in YAML if you prefer manual phrasing.
+
+   > **Offline fallback:** If external data providers are blocked (common in CI sandboxes), run `python scripts/generate_sample_data.py` to synthesize deterministic, daily series from 2000 onwards.
 
 3. **Launch a static server** for the `site/` directory:
 

@@ -159,9 +159,7 @@ const state = {
 };
 
 const charts = {
-  events: null,
-  macro: null,
-  markets: null
+  timeline: null
 };
 
 async function fetchDataset(name, fallback) {
@@ -487,6 +485,7 @@ function prepareMacroSeries() {
     return {
       name: def.label,
       type: "line",
+      yAxisIndex: 1,
       smooth: state.selections.smoothLines,
       showSymbol: false,
       emphasis: { focus: "series" },
@@ -508,6 +507,7 @@ function prepareMarketSeries() {
     return {
       name: def.label,
       type: "line",
+      yAxisIndex: 0,
       smooth: state.selections.smoothLines,
       showSymbol: false,
       emphasis: { focus: "series" },
@@ -546,7 +546,7 @@ function clusterEvents(minGapDays = 10) {
   });
 }
 
-function prepareEventSeries() {
+function prepareEventSeries(theme) {
   const clusters = clusterEvents();
   const scatterData = clusters.map((cluster) => ({
     value: [cluster.timestamp, 1],
@@ -557,31 +557,69 @@ function prepareEventSeries() {
   const lineData = clusters.map((cluster) => ({
     coords: [
       [cluster.timestamp, 0],
-      [cluster.timestamp, 0.82]
+      [cluster.timestamp, 1]
     ]
   }));
 
   return {
-    scatterData,
-    lineData
+    stems: {
+      name: "Event stems",
+      type: "lines",
+      showInLegend: false,
+      silent: true,
+      coordinateSystem: "cartesian2d",
+      yAxisIndex: 2,
+      zlevel: 1,
+      lineStyle: {
+        color: theme.accent,
+        width: 1.2,
+        type: "dashed",
+        opacity: 0.6
+      },
+      data: lineData,
+      tooltip: { show: false }
+    },
+    markers: {
+      name: "Narrative events",
+      type: "scatter",
+      yAxisIndex: 2,
+      symbolSize: 16,
+      data: scatterData,
+      label: {
+        show: state.selections.showAnnotations,
+        position: "top",
+        align: "center",
+        color: theme.textColor,
+        backgroundColor: `${theme.accent}22`,
+        borderColor: theme.accent,
+        borderWidth: 1,
+        borderRadius: 6,
+        padding: [4, 8],
+        formatter: (params) => params.data.label,
+        overflow: "break"
+      },
+      itemStyle: {
+        color: theme.accent,
+        borderColor: theme.backgroundColor,
+        borderWidth: 1.4
+      },
+      tooltip: { show: false }
+    }
   };
 }
 
 function initCharts() {
-  charts.events = echarts.init(document.getElementById("events-chart"), null, { renderer: "canvas" });
-  charts.macro = echarts.init(document.getElementById("macro-chart"), null, { renderer: "canvas" });
-  charts.markets = echarts.init(document.getElementById("markets-chart"), null, { renderer: "canvas" });
+  const element = document.getElementById("timeline-chart");
+  if (element) {
+    charts.timeline = echarts.init(element, null, { renderer: "canvas" });
+  }
 
-  charts.events.group = "timeline-group";
-  charts.macro.group = "timeline-group";
-  charts.markets.group = "timeline-group";
-  echarts.connect("timeline-group");
-
-  window.addEventListener("resize", debounce(() => {
-    charts.events?.resize();
-    charts.macro?.resize();
-    charts.markets?.resize();
-  }, 150));
+  window.addEventListener(
+    "resize",
+    debounce(() => {
+      charts.timeline?.resize();
+    }, 150)
+  );
 }
 
 function getChartTheme() {
@@ -596,197 +634,122 @@ function getChartTheme() {
 }
 
 function refreshCharts() {
-  if (!charts.events || !charts.macro || !charts.markets) return;
+  if (!charts.timeline) return;
   if (!state.selections.startDate || !state.selections.endDate) return;
   const theme = getChartTheme();
   const start = state.selections.startDate.getTime();
   const end = state.selections.endDate.getTime();
 
-  const macroSeries = prepareMacroSeries();
   const marketSeries = prepareMarketSeries();
-  const { scatterData, lineData } = prepareEventSeries();
+  const macroSeries = prepareMacroSeries();
+  const eventSeries = prepareEventSeries(theme);
 
-  charts.events.setOption(
+  const legendEntries = Array.from(
+    new Set([
+      ...marketSeries.map((series) => series.name),
+      ...macroSeries.map((series) => series.name),
+      eventSeries.markers.name
+    ])
+  );
+
+  charts.timeline.setOption(
     {
       backgroundColor: theme.backgroundColor,
-      grid: { top: 28, left: 36, right: 24, bottom: 28 },
+      grid: { top: 48, left: 64, right: 64, bottom: 88 },
+      legend: {
+        data: legendEntries,
+        textStyle: { color: theme.textColor },
+        top: 0,
+        icon: "circle"
+      },
       tooltip: {
-        trigger: "item",
-        className: "event-tooltip",
+        trigger: "axis",
+        axisPointer: { type: "cross" },
         backgroundColor: theme.backgroundColor,
         borderColor: theme.borderColor,
         textStyle: { color: theme.textColor },
         formatter: (params) => {
-          const data = params.data;
-          if (!data?.events) return "";
-          const lines = data.events
-            .map((event) => `<strong>${event.title}</strong><br/><span class="text-muted">${event.brief}</span>`)
-            .join("<br/><br/>");
-          return `<div class="space-y-2"><div class="text-xs uppercase tracking-wide text-muted">${formatDateTooltip(
-            data.value[0]
-          )}</div>${lines}</div>`;
+          if (!params || !params.length) return "";
+          const axisValue = Number(params[0].axisValue);
+          const header = `<div class='text-xs uppercase tracking-wide text-muted'>${formatDateTooltip(axisValue)}</div>`;
+          const metricRows = params
+            .filter((item) => item.seriesType === "line")
+            .map(
+              (item) => `
+                <div class='flex justify-between gap-8'>
+                  <span style='color:${item.color}'>${item.seriesName}</span>
+                  <span>${formatNumber(Number(item.value[1]))}</span>
+                </div>`
+            )
+            .join("");
+
+          const eventItems = params.filter((item) => item.seriesType === "scatter" && item.data?.events?.length);
+          let eventsSection = "";
+          if (eventItems.length) {
+            const entries = [];
+            eventItems.forEach((item) => {
+              item.data.events.forEach((event) => {
+                entries.push(
+                  `<div><strong>${event.title}</strong><div class='text-muted'>${event.brief}</div></div>`
+                );
+              });
+            });
+            eventsSection = `
+              <div style='margin-top:8px;padding-top:8px;border-top:1px solid ${theme.borderColor}'>
+                ${entries.join("<div style='height:6px'></div>")}
+              </div>
+            `;
+          }
+
+          return `${header}${metricRows}${eventsSection}`;
         }
       },
+      dataZoom: [
+        { type: "inside", xAxisIndex: 0 },
+        { type: "slider", xAxisIndex: 0, brushSelect: false, bottom: 24, height: 24 }
+      ],
       xAxis: {
         type: "time",
         min: start,
         max: end,
         axisLabel: { color: theme.mutedColor },
         axisLine: { lineStyle: { color: theme.borderColor } },
-        axisPointer: {
-          label: { color: theme.textColor, backgroundColor: theme.borderColor }
-        }
+        axisPointer: { label: { color: theme.textColor, backgroundColor: theme.borderColor } }
       },
-      yAxis: {
-        type: "value",
-        min: 0,
-        max: 1,
-        show: false
-      },
-      series: [
+      yAxis: [
         {
-          name: "Event stems",
-          type: "lines",
-          coordinateSystem: "cartesian2d",
-          zlevel: 1,
-          polyline: false,
-          data: lineData,
-          lineStyle: {
-            color: theme.accent,
-            width: 1.5,
-            type: "dashed"
-          }
-        },
-        {
-          name: "Events",
-          type: "scatter",
-          data: scatterData,
-          symbolSize: 14,
-          label: {
-            show: state.selections.showAnnotations,
-            position: "top",
-            align: "center",
-            color: theme.textColor,
-            backgroundColor: `${theme.accent}22`,
-            borderColor: theme.accent,
-            borderWidth: 1,
-            borderRadius: 6,
-            padding: [4, 8],
-            formatter: (params) => params.data.label,
-            overflow: "break"
+          type: state.selections.logScale ? "log" : "value",
+          position: "left",
+          name: state.selections.rebase ? "Markets (rebased = 100)" : "Markets",
+          nameLocation: "middle",
+          nameGap: 48,
+          axisLabel: {
+            color: theme.mutedColor,
+            formatter: (value) =>
+              state.selections.rebase ? Number(value).toFixed(0) : formatNumber(Number(value))
           },
-          itemStyle: {
-            color: theme.accent,
-            borderColor: theme.backgroundColor,
-            borderWidth: 1.5
-          }
-        }
-      ]
-    },
-    true
-  );
-
-  charts.macro.setOption(
-    {
-      backgroundColor: theme.backgroundColor,
-      grid: { top: 32, left: 56, right: 56, bottom: 40 },
-      legend: {
-        data: macroSeries.map((series) => series.name),
-        textStyle: { color: theme.textColor },
-        top: 0
-      },
-      tooltip: {
-        trigger: "axis",
-        axisPointer: { type: "cross" },
-        backgroundColor: theme.backgroundColor,
-        borderColor: theme.borderColor,
-        textStyle: { color: theme.textColor },
-        formatter: (params) => {
-          if (!params || !params.length) return "";
-          const header = `<div class="text-xs uppercase tracking-wide text-muted">${formatDateTooltip(params[0].value[0])}</div>`;
-          const body = params
-            .map((item) => `
-              <div class="flex justify-between gap-8">
-                <span style="color:${item.color}">${item.seriesName}</span>
-                <span>${formatNumber(item.value[1])}</span>
-              </div>`)
-            .join("");
-          return `${header}${body}`;
-        }
-      },
-      dataZoom: [
-        { type: "inside", xAxisIndex: 0 },
-        { type: "slider", xAxisIndex: 0, brushSelect: false, bottom: 0, height: 20 }
-      ],
-      xAxis: {
-        type: "time",
-        min: start,
-        max: end,
-        axisLabel: { color: theme.mutedColor },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        axisPointer: { label: { color: theme.textColor, backgroundColor: theme.borderColor } }
-      },
-      yAxis: {
-        type: state.selections.logScale ? "log" : "value",
-        axisLabel: { color: theme.mutedColor },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        splitLine: { lineStyle: { color: `${theme.borderColor}55` } }
-      },
-      series: macroSeries
-    },
-    true
-  );
-
-  charts.markets.setOption(
-    {
-      backgroundColor: theme.backgroundColor,
-      grid: { top: 32, left: 56, right: 56, bottom: 40 },
-      legend: {
-        data: marketSeries.map((series) => series.name),
-        textStyle: { color: theme.textColor },
-        top: 0
-      },
-      tooltip: {
-        trigger: "axis",
-        axisPointer: { type: "cross" },
-        backgroundColor: theme.backgroundColor,
-        borderColor: theme.borderColor,
-        textStyle: { color: theme.textColor },
-        formatter: (params) => {
-          if (!params || !params.length) return "";
-          const header = `<div class="text-xs uppercase tracking-wide text-muted">${formatDateTooltip(params[0].value[0])}</div>`;
-          const body = params
-            .map((item) => `
-              <div class="flex justify-between gap-8">
-                <span style="color:${item.color}">${item.seriesName}</span>
-                <span>${formatNumber(item.value[1])}</span>
-              </div>`)
-            .join("");
-          return `${header}${body}`;
-        }
-      },
-      dataZoom: [
-        { type: "inside", xAxisIndex: 0 },
-        { type: "slider", xAxisIndex: 0, brushSelect: false, bottom: 0, height: 20 }
-      ],
-      xAxis: {
-        type: "time",
-        min: start,
-        max: end,
-        axisLabel: { color: theme.mutedColor },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        axisPointer: { label: { color: theme.textColor, backgroundColor: theme.borderColor } }
-      },
-      yAxis: {
-        type: state.selections.logScale ? "log" : "value",
-        axisLabel: {
-          color: theme.mutedColor,
-          formatter: (value) => (state.selections.rebase ? value.toFixed(0) : value)
+          axisLine: { lineStyle: { color: theme.borderColor } },
+          splitLine: { lineStyle: { color: `${theme.borderColor}55` } }
         },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        splitLine: { lineStyle: { color: `${theme.borderColor}55` } }
-      },
-      series: marketSeries
+        {
+          type: "value",
+          position: "right",
+          name: "Macro",
+          nameLocation: "middle",
+          nameGap: 52,
+          alignTicks: true,
+          axisLabel: { color: theme.mutedColor },
+          axisLine: { lineStyle: { color: theme.borderColor } },
+          splitLine: { show: false }
+        },
+        {
+          type: "value",
+          min: 0,
+          max: 1,
+          show: false
+        }
+      ],
+      series: [...marketSeries, ...macroSeries, eventSeries.stems, eventSeries.markers]
     },
     true
   );

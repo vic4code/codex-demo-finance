@@ -8,8 +8,8 @@
   --border: rgba(15, 23, 42, 0.12);
   --accent: #facc15;
   --accent-strong: #fbbf24;
-  --chart-height-desktop: clamp(280px, 35vh, 420px);
-  --chart-height-mobile: clamp(220px, 48vh, 360px);
+  --chart-height-desktop: clamp(320px, 45vh, 560px);
+  --chart-height-mobile: clamp(260px, 56vh, 420px);
   --transition-duration: 160ms;
 }
 
