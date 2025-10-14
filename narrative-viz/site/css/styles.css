@@ -1,0 +1,201 @@
+:root {
+  color-scheme: light dark;
+  --font-sans: "Inter Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --surface: #f8fafc;
+  --surface-strong: #edf2ff;
+  --foreground: #0f172a;
+  --muted: #475569;
+  --border: rgba(15, 23, 42, 0.12);
+  --accent: #facc15;
+  --accent-strong: #fbbf24;
+  --chart-height-desktop: clamp(280px, 35vh, 420px);
+  --chart-height-mobile: clamp(220px, 48vh, 360px);
+  --transition-duration: 160ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #0b1120;
+    --surface-strong: #111c2f;
+    --foreground: #e2e8f0;
+    --muted: #94a3b8;
+    --border: rgba(226, 232, 240, 0.16);
+    --accent: #facc15;
+    --accent-strong: #fde047;
+  }
+}
+
+[data-theme="light"] {
+  --surface: #f8fafc;
+  --surface-strong: #edf2ff;
+  --foreground: #0f172a;
+  --muted: #475569;
+  --border: rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="dark"] {
+  --surface: #0b1120;
+  --surface-strong: #111c2f;
+  --foreground: #e2e8f0;
+  --muted: #94a3b8;
+  --border: rgba(226, 232, 240, 0.16);
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
+}
+
+.bg-surface {
+  background-color: var(--surface);
+}
+
+.bg-surface-strong {
+  background-color: var(--surface-strong);
+}
+
+.text-foreground {
+  color: var(--foreground);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+.border-border {
+  border-color: var(--border);
+}
+
+.chart-panel {
+  width: 100%;
+  min-height: var(--chart-height-desktop);
+  background: linear-gradient(145deg, rgba(148, 163, 184, 0.08), transparent);
+  border-radius: 1.25rem;
+  border: 1px solid var(--border);
+  padding: clamp(0.75rem, 1vw, 1.25rem);
+  box-shadow: 0 16px 45px -35px rgba(15, 23, 42, 0.6);
+}
+
+@media (max-width: 1024px) {
+  .chart-panel {
+    min-height: var(--chart-height-mobile);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@supports (font-variation-settings: normal) {
+  body {
+    font-variation-settings: "wght" 450;
+  }
+}
+
+#drawer-backdrop.show {
+  display: block;
+}
+
+.drawer-open #control-panel {
+  transform: translateX(0);
+}
+
+.drawer-open {
+  overflow: hidden;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  width: 42px;
+  height: 24px;
+  align-items: center;
+}
+
+.toggle-switch input {
+  appearance: none;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: rgba(148, 163, 184, 0.4);
+  transition: background var(--transition-duration) ease;
+  cursor: pointer;
+}
+
+.toggle-switch input:checked {
+  background: var(--accent);
+}
+
+.toggle-switch input::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--surface);
+  transition: transform var(--transition-duration) ease;
+}
+
+.toggle-switch input:checked::before {
+  transform: translateX(18px);
+}
+
+.control-group {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem;
+  background-color: var(--surface);
+  box-shadow: 0 20px 45px -35px rgba(15, 23, 42, 0.4);
+}
+
+.control-group h4 {
+  font-size: clamp(0.95rem, 1vw, 1.05rem);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.control-group label,
+.control-group legend {
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+}
+
+.control-group .description {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+#data-status.show {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+  }
+
+  header {
+    backdrop-filter: blur(12px);
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-panel {
+    border-radius: 1rem;
+    padding: 0.75rem;
+  }
+}

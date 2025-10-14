@@ -1,0 +1,9 @@
+[
+  { "date": "2000-03-10", "title": "Dot-com bubble peak", "brief": "NASDAQ peaked and entered a prolonged correction." },
+  { "date": "2001-09-11", "title": "9/11 attacks", "brief": "Terrorist attacks in the U.S. shocked global markets." },
+  { "date": "2008-09-15", "title": "Lehman Brothers collapse", "brief": "Catalyst of the global financial crisis." },
+  { "date": "2018-02-05", "title": "Volmageddon", "brief": "Inverse VIX ETNs imploded amid a volatility spike." },
+  { "date": "2020-03-16", "title": "COVID-19 circuit breaker", "brief": "Market meltdown and policy bazooka followed." },
+  { "date": "2022-02-24", "title": "Russia–Ukraine war", "brief": "Risk-off flows to USD and commodities." },
+  { "date": "2023-03-10", "title": "SVB collapse", "brief": "Banking stress revived recession fears." }
+]

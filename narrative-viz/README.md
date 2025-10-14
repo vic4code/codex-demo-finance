@@ -4,8 +4,6 @@ An interactive, fully client-side visual narrative that overlays historic market
 
 ![Narrative timeline placeholder](https://dummyimage.com/1280x720/0f172a/ffffff&text=Narrative-Driven+Market+Timeline)
 
-> **Live site:** https://vic4code.github.io/codex-demo-finance/
-
 ## Features
 
 - **Triple-layer storytelling** – Events, macro indicators, and market indices share a synchronized time axis, zoom level, and crosshair.
@@ -18,6 +16,7 @@ An interactive, fully client-side visual narrative that overlays historic market
 ## Project structure
 
 ```
+narrative-viz/
 ├─ site/                 # GitHub Pages root
 │  ├─ index.html         # Landing page + visualization
 │  ├─ css/styles.css     # Tailwind-friendly custom styling
@@ -65,18 +64,12 @@ An interactive, fully client-side visual narrative that overlays historic market
 
 ## GitHub Pages deployment
 
-The repository is structured so that GitHub Pages can publish straight from the `site/` directory with no extra build step. To
-make the visualization available via `https://<username>.github.io/<repository>/` (and viewable on mobile immediately), follow
-these steps after pushing the project to GitHub:
-
-1. Push the repository to GitHub (the default branch should be `main`).
-2. In the GitHub UI, navigate to **Settings → Pages**.
-3. Under **Build and deployment**, choose **Source → GitHub Actions**. This allows the bundled workflow to control deploys.
-4. Save the settings. The next workflow run (triggered automatically or manually) publishes the contents of `site/`.
-5. Grab the Pages URL shown in the **Deployments** panel (it will look like `https://<username>.github.io/<repository>/`) and
-   share or bookmark it. The layout is responsive, so opening the link on a phone uses the mobile drawer controls.
-
-> **Tip:** You can trigger the first deployment instantly by visiting **Actions → Update data and deploy → Run workflow**.
+1. Push the repository to GitHub.
+2. Open the repository settings → **Pages** and select:
+   - Source: `Deploy from a branch`
+   - Branch: `main`
+   - Folder: `/site`
+3. The included workflow uploads the `site/` directory as the Pages artifact after every scheduled run or manual dispatch.
 
 ## Automation workflow
 
