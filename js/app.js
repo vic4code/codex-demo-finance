@@ -1,127 +1,3 @@
-const SAMPLE_DATA = {
-  prices: {
-    "^GSPC": [
-      { t: 1672444800000, v: 3823.96 },
-      { t: 1675036800000, v: 4070.56 },
-      { t: 1677628800000, v: 4046.56 },
-      { t: 1680307200000, v: 4155.22 },
-      { t: 1682899200000, v: 4221.02 },
-      { t: 1685577600000, v: 4450.38 },
-      { t: 1688169600000, v: 4511.89 }
-    ],
-    "^IXIC": [
-      { t: 1672444800000, v: 10466.48 },
-      { t: 1675036800000, v: 11512.41 },
-      { t: 1677628800000, v: 11394.94 },
-      { t: 1680307200000, v: 12142.24 },
-      { t: 1682899200000, v: 12646.95 },
-      { t: 1685577600000, v: 13461.92 },
-      { t: 1688169600000, v: 13787.92 }
-    ],
-    GLD: [
-      { t: 1672444800000, v: 168.15 },
-      { t: 1675036800000, v: 179.31 },
-      { t: 1677628800000, v: 171.35 },
-      { t: 1680307200000, v: 182.15 },
-      { t: 1682899200000, v: 182.77 },
-      { t: 1685577600000, v: 180.57 },
-      { t: 1688169600000, v: 183.22 }
-    ],
-    TLT: [
-      { t: 1672444800000, v: 104.19 },
-      { t: 1675036800000, v: 107.65 },
-      { t: 1677628800000, v: 103.84 },
-      { t: 1680307200000, v: 108.99 },
-      { t: 1682899200000, v: 102.21 },
-      { t: 1685577600000, v: 102.53 },
-      { t: 1688169600000, v: 100.07 }
-    ],
-    UUP: [
-      { t: 1672444800000, v: 27.8 },
-      { t: 1675036800000, v: 28.15 },
-      { t: 1677628800000, v: 27.58 },
-      { t: 1680307200000, v: 27.98 },
-      { t: 1682899200000, v: 27.61 },
-      { t: 1685577600000, v: 27.68 },
-      { t: 1688169600000, v: 28.27 }
-    ],
-    "BTC-USD": [
-      { t: 1672444800000, v: 16547.5 },
-      { t: 1675036800000, v: 23126.41 },
-      { t: 1677628800000, v: 23427.73 },
-      { t: 1680307200000, v: 28468.31 },
-      { t: 1682899200000, v: 28316.2 },
-      { t: 1685577600000, v: 30466.96 },
-      { t: 1688169600000, v: 30477.43 }
-    ],
-    "^VIX": [
-      { t: 1672444800000, v: 21.67 },
-      { t: 1675036800000, v: 19.85 },
-      { t: 1677628800000, v: 18.49 },
-      { t: 1680307200000, v: 19.02 },
-      { t: 1682899200000, v: 17.95 },
-      { t: 1685577600000, v: 13.44 },
-      { t: 1688169600000, v: 13.59 }
-    ]
-  },
-  macro: {
-    VIX: [
-      { t: 1672444800000, v: 21.67 },
-      { t: 1675036800000, v: 19.85 },
-      { t: 1677628800000, v: 18.49 },
-      { t: 1680307200000, v: 19.02 },
-      { t: 1682899200000, v: 17.95 },
-      { t: 1685577600000, v: 13.44 },
-      { t: 1688169600000, v: 13.59 }
-    ],
-    DXY: [
-      { t: 1672444800000, v: 103.44 },
-      { t: 1675036800000, v: 102.06 },
-      { t: 1677628800000, v: 105.21 },
-      { t: 1680307200000, v: 102.06 },
-      { t: 1682899200000, v: 104.04 },
-      { t: 1685577600000, v: 103.27 },
-      { t: 1688169600000, v: 102.92 }
-    ],
-    TENY: [
-      { t: 1672444800000, v: 3.88 },
-      { t: 1675036800000, v: 3.53 },
-      { t: 1677628800000, v: 3.96 },
-      { t: 1680307200000, v: 3.47 },
-      { t: 1682899200000, v: 3.57 },
-      { t: 1685577600000, v: 3.81 },
-      { t: 1688169600000, v: 3.84 }
-    ],
-    CPI_YoY: [
-      { t: 1669852800000, v: 7.1 },
-      { t: 1672444800000, v: 6.5 },
-      { t: 1675123200000, v: 6.4 },
-      { t: 1677628800000, v: 6.0 },
-      { t: 1680307200000, v: 4.9 },
-      { t: 1682899200000, v: 4.0 },
-      { t: 1685577600000, v: 3.0 }
-    ],
-    OIL: [
-      { t: 1672444800000, v: 79.65 },
-      { t: 1675036800000, v: 74.47 },
-      { t: 1677628800000, v: 76.32 },
-      { t: 1680307200000, v: 75.67 },
-      { t: 1682899200000, v: 71.74 },
-      { t: 1685577600000, v: 69.93 },
-      { t: 1688169600000, v: 80.72 }
-    ]
-  },
-  events: [
-    { date: "2000-03-10", title: "Dot-com bubble peak", brief: "NASDAQ peaked and entered a prolonged correction." },
-    { date: "2001-09-11", title: "9/11 attacks", brief: "Terrorist attacks in the U.S. shocked global markets." },
-    { date: "2008-09-15", title: "Lehman Brothers collapse", brief: "Catalyst of the global financial crisis." },
-    { date: "2018-02-05", title: "Volmageddon", brief: "Inverse VIX ETNs imploded amid a volatility spike." },
-    { date: "2020-03-16", title: "COVID-19 circuit breaker", brief: "Market meltdown and policy bazooka followed." },
-    { date: "2022-02-24", title: "Russia–Ukraine war", brief: "Risk-off flows to USD and commodities." },
-    { date: "2023-03-10", title: "SVB collapse", brief: "Banking stress revived recession fears." }
-  ]
-};
-
 const MACRO_DEFINITIONS = [
   { key: "VIX", label: "VIX", color: "#f97316" },
   { key: "TENY", label: "US 10Y Yield", color: "#22d3ee" },
@@ -162,7 +38,7 @@ const charts = {
   timeline: null
 };
 
-async function fetchDataset(name, fallback) {
+async function fetchDataset(name) {
   const basePaths = [
     `./data/${name}.json`,
     `data/${name}.json`,
@@ -172,27 +48,33 @@ async function fetchDataset(name, fallback) {
     try {
       const response = await fetch(path, { cache: "no-cache" });
       if (response.ok) {
-        return { data: await response.json(), usedFallback: false };
+        return { data: await response.json(), message: null };
       }
     } catch (error) {
       // Continue to next path
     }
   }
-  state.fallbackMessages.push(`Live ${name} feed unavailable. Showing cached sample.`);
-  return { data: fallback, usedFallback: true };
+  return {
+    data: null,
+    message: `Unable to load ${name} dataset from the bundled data directory.`
+  };
 }
 
 async function loadData() {
   state.fallbackMessages = [];
   const [prices, macro, events] = await Promise.all([
-    fetchDataset("prices", SAMPLE_DATA.prices),
-    fetchDataset("macro", SAMPLE_DATA.macro),
-    fetchDataset("events", SAMPLE_DATA.events)
+    fetchDataset("prices"),
+    fetchDataset("macro"),
+    fetchDataset("events")
   ]);
 
   state.data.prices = prices.data || {};
   state.data.macro = macro.data || {};
-  state.data.events = Array.isArray(events.data) ? events.data : SAMPLE_DATA.events;
+  state.data.events = Array.isArray(events.data) ? events.data : [];
+
+  [prices, macro, events]
+    .filter((result) => result.message)
+    .forEach((result) => state.fallbackMessages.push(result.message));
 
   initializeDateRange();
   showFallbackBanner();
@@ -476,7 +358,7 @@ function toPairs(series) {
   return series.map((point) => [point.t, point.v]);
 }
 
-function prepareMacroSeries() {
+function prepareMacroSeries(xAxisIndex, yAxisIndex) {
   const start = state.selections.startDate;
   const end = state.selections.endDate;
   return MACRO_DEFINITIONS.filter((def) => state.selections.macros.has(def.key)).map((def) => {
@@ -485,7 +367,8 @@ function prepareMacroSeries() {
     return {
       name: def.label,
       type: "line",
-      yAxisIndex: 1,
+      xAxisIndex,
+      yAxisIndex,
       smooth: state.selections.smoothLines,
       showSymbol: false,
       emphasis: { focus: "series" },
@@ -497,7 +380,7 @@ function prepareMacroSeries() {
   });
 }
 
-function prepareMarketSeries() {
+function prepareMarketSeries(xAxisIndex, yAxisIndex) {
   const start = state.selections.startDate;
   const end = state.selections.endDate;
   return MARKET_DEFINITIONS.filter((def) => state.selections.markets.has(def.key)).map((def) => {
@@ -507,7 +390,8 @@ function prepareMarketSeries() {
     return {
       name: def.label,
       type: "line",
-      yAxisIndex: 0,
+      xAxisIndex,
+      yAxisIndex,
       smooth: state.selections.smoothLines,
       showSymbol: false,
       emphasis: { focus: "series" },
@@ -546,7 +430,7 @@ function clusterEvents(minGapDays = 10) {
   });
 }
 
-function prepareEventSeries(theme) {
+function prepareEventSeries(theme, xAxisIndex, yAxisIndex) {
   const clusters = clusterEvents();
   const scatterData = clusters.map((cluster) => ({
     value: [cluster.timestamp, 1],
@@ -568,7 +452,8 @@ function prepareEventSeries(theme) {
       showInLegend: false,
       silent: true,
       coordinateSystem: "cartesian2d",
-      yAxisIndex: 2,
+      xAxisIndex,
+      yAxisIndex,
       zlevel: 1,
       lineStyle: {
         color: theme.accent,
@@ -582,7 +467,8 @@ function prepareEventSeries(theme) {
     markers: {
       name: "Narrative events",
       type: "scatter",
-      yAxisIndex: 2,
+      xAxisIndex,
+      yAxisIndex,
       symbolSize: 16,
       data: scatterData,
       label: {
@@ -598,6 +484,7 @@ function prepareEventSeries(theme) {
         formatter: (params) => params.data.label,
         overflow: "break"
       },
+      labelLayout: { moveOverlap: "shiftY" },
       itemStyle: {
         color: theme.accent,
         borderColor: theme.backgroundColor,
@@ -640,14 +527,73 @@ function refreshCharts() {
   const start = state.selections.startDate.getTime();
   const end = state.selections.endDate.getTime();
 
-  const marketSeries = prepareMarketSeries();
-  const macroSeries = prepareMacroSeries();
-  const eventSeries = prepareEventSeries(theme);
+  const gridConfigs = [
+    { top: 96, height: 78, left: 80, right: 80, containLabel: true },
+    { top: 204, height: 150, left: 80, right: 80, containLabel: true },
+    { top: 388, height: 190, left: 80, right: 80, containLabel: true }
+  ];
+
+  const xAxes = gridConfigs.map((grid, index) => ({
+    type: "time",
+    gridIndex: index,
+    min: start,
+    max: end,
+    axisLabel: {
+      color: theme.mutedColor,
+      show: index === gridConfigs.length - 1
+    },
+    axisTick: { show: index === gridConfigs.length - 1 },
+    axisLine: {
+      show: index === gridConfigs.length - 1,
+      lineStyle: { color: theme.borderColor }
+    },
+    splitLine: { show: false },
+    axisPointer: { label: { color: theme.textColor, backgroundColor: theme.borderColor } }
+  }));
+
+  const yAxes = [
+    {
+      type: "value",
+      gridIndex: 0,
+      min: 0,
+      max: 1.1,
+      show: false,
+      splitLine: { show: false }
+    },
+    {
+      type: "value",
+      gridIndex: 1,
+      name: "Macro indicators",
+      nameLocation: "middle",
+      nameGap: 56,
+      axisLabel: { color: theme.mutedColor },
+      axisLine: { lineStyle: { color: theme.borderColor } },
+      splitLine: { lineStyle: { color: `${theme.borderColor}44` } }
+    },
+    {
+      type: state.selections.logScale ? "log" : "value",
+      gridIndex: 2,
+      name: state.selections.rebase ? "Markets (rebased = 100)" : "Markets",
+      nameLocation: "middle",
+      nameGap: 64,
+      axisLabel: {
+        color: theme.mutedColor,
+        formatter: (value) =>
+          state.selections.rebase ? Number(value).toFixed(0) : formatNumber(Number(value))
+      },
+      axisLine: { lineStyle: { color: theme.borderColor } },
+      splitLine: { lineStyle: { color: `${theme.borderColor}44` } }
+    }
+  ];
+
+  const marketSeries = prepareMarketSeries(2, 2);
+  const macroSeries = prepareMacroSeries(1, 1);
+  const eventSeries = prepareEventSeries(theme, 0, 0);
 
   const legendEntries = Array.from(
     new Set([
-      ...marketSeries.map((series) => series.name),
       ...macroSeries.map((series) => series.name),
+      ...marketSeries.map((series) => series.name),
       eventSeries.markers.name
     ])
   );
@@ -655,101 +601,77 @@ function refreshCharts() {
   charts.timeline.setOption(
     {
       backgroundColor: theme.backgroundColor,
-      grid: { top: 48, left: 64, right: 64, bottom: 88 },
+      grid: gridConfigs,
       legend: {
         data: legendEntries,
         textStyle: { color: theme.textColor },
-        top: 0,
-        icon: "circle"
+        top: 16,
+        icon: "circle",
+        itemGap: 16,
+        type: "scroll"
       },
       tooltip: {
         trigger: "axis",
-        axisPointer: { type: "cross" },
+        axisPointer: { type: "cross", link: [{ xAxisIndex: [0, 1, 2] }] },
         backgroundColor: theme.backgroundColor,
         borderColor: theme.borderColor,
         textStyle: { color: theme.textColor },
+        extraCssText: "box-shadow:0 12px 34px -20px rgba(15,23,42,0.5);border-radius:12px;padding:12px 16px;",
         formatter: (params) => {
           if (!params || !params.length) return "";
           const axisValue = Number(params[0].axisValue);
-          const header = `<div class='text-xs uppercase tracking-wide text-muted'>${formatDateTooltip(axisValue)}</div>`;
-          const metricRows = params
-            .filter((item) => item.seriesType === "line")
-            .map(
-              (item) => `
-                <div class='flex justify-between gap-8'>
-                  <span style='color:${item.color}'>${item.seriesName}</span>
-                  <span>${formatNumber(Number(item.value[1]))}</span>
-                </div>`
-            )
-            .join("");
+          const header = `<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.12em;color:${theme.mutedColor}">${formatDateTooltip(axisValue)}</div>`;
 
+          const buildRows = (items) =>
+            items
+              .map(
+                (item) => `
+                  <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;">
+                    <span style="display:flex;align-items:center;gap:6px;color:${item.color}">${item.marker || ""}${item.seriesName}</span>
+                    <span>${formatNumber(Number(item.value[1]))}</span>
+                  </div>`
+              )
+              .join("");
+
+          const macroItems = params.filter((item) => item.seriesType === "line" && item.yAxisIndex === 1);
+          const marketItems = params.filter((item) => item.seriesType === "line" && item.yAxisIndex === 2);
           const eventItems = params.filter((item) => item.seriesType === "scatter" && item.data?.events?.length);
-          let eventsSection = "";
+
+          const sections = [];
+          if (marketItems.length) {
+            sections.push(
+              `<div style="margin-top:12px"><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.16em;color:${theme.mutedColor}">Markets</div><div style="margin-top:6px;display:grid;gap:6px">${buildRows(marketItems)}</div></div>`
+            );
+          }
+          if (macroItems.length) {
+            sections.push(
+              `<div style="margin-top:12px"><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.16em;color:${theme.mutedColor}">Macro</div><div style="margin-top:6px;display:grid;gap:6px">${buildRows(macroItems)}</div></div>`
+            );
+          }
           if (eventItems.length) {
-            const entries = [];
+            const eventEntries = [];
             eventItems.forEach((item) => {
               item.data.events.forEach((event) => {
-                entries.push(
-                  `<div><strong>${event.title}</strong><div class='text-muted'>${event.brief}</div></div>`
+                eventEntries.push(
+                  `<div style="padding:6px 0;border-bottom:1px solid ${theme.borderColor}"><strong style="display:block;font-size:0.75rem;margin-bottom:2px;">${event.title}</strong><span style="color:${theme.mutedColor};font-size:0.75rem;">${event.brief}</span></div>`
                 );
               });
             });
-            eventsSection = `
-              <div style='margin-top:8px;padding-top:8px;border-top:1px solid ${theme.borderColor}'>
-                ${entries.join("<div style='height:6px'></div>")}
-              </div>
-            `;
+            sections.push(
+              `<div style="margin-top:12px"><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.16em;color:${theme.mutedColor}">Events</div><div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">${eventEntries.join("")}</div></div>`
+            );
           }
 
-          return `${header}${metricRows}${eventsSection}`;
+          return `${header}${sections.join("")}`;
         }
       },
       dataZoom: [
-        { type: "inside", xAxisIndex: 0 },
-        { type: "slider", xAxisIndex: 0, brushSelect: false, bottom: 24, height: 24 }
+        { type: "inside", xAxisIndex: [0, 1, 2] },
+        { type: "slider", xAxisIndex: [0, 1, 2], brushSelect: false, bottom: 20, height: 24 }
       ],
-      xAxis: {
-        type: "time",
-        min: start,
-        max: end,
-        axisLabel: { color: theme.mutedColor },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        axisPointer: { label: { color: theme.textColor, backgroundColor: theme.borderColor } }
-      },
-      yAxis: [
-        {
-          type: state.selections.logScale ? "log" : "value",
-          position: "left",
-          name: state.selections.rebase ? "Markets (rebased = 100)" : "Markets",
-          nameLocation: "middle",
-          nameGap: 48,
-          axisLabel: {
-            color: theme.mutedColor,
-            formatter: (value) =>
-              state.selections.rebase ? Number(value).toFixed(0) : formatNumber(Number(value))
-          },
-          axisLine: { lineStyle: { color: theme.borderColor } },
-          splitLine: { lineStyle: { color: `${theme.borderColor}55` } }
-        },
-        {
-          type: "value",
-          position: "right",
-          name: "Macro",
-          nameLocation: "middle",
-          nameGap: 52,
-          alignTicks: true,
-          axisLabel: { color: theme.mutedColor },
-          axisLine: { lineStyle: { color: theme.borderColor } },
-          splitLine: { show: false }
-        },
-        {
-          type: "value",
-          min: 0,
-          max: 1,
-          show: false
-        }
-      ],
-      series: [...marketSeries, ...macroSeries, eventSeries.stems, eventSeries.markers]
+      xAxis: xAxes,
+      yAxis: yAxes,
+      series: [eventSeries.stems, eventSeries.markers, ...macroSeries, ...marketSeries]
     },
     true
   );

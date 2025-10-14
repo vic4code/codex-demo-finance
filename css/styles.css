@@ -8,8 +8,8 @@
   --border: rgba(15, 23, 42, 0.12);
   --accent: #facc15;
   --accent-strong: #fbbf24;
-  --chart-height-desktop: clamp(320px, 45vh, 560px);
-  --chart-height-mobile: clamp(260px, 56vh, 420px);
+  --chart-height-desktop: clamp(460px, 60vh, 720px);
+  --chart-height-mobile: clamp(360px, 70vh, 540px);
   --transition-duration: 160ms;
 }
 
@@ -71,10 +71,11 @@ body {
 .chart-panel {
   width: 100%;
   min-height: var(--chart-height-desktop);
-  background: linear-gradient(145deg, rgba(148, 163, 184, 0.08), transparent);
+  background: radial-gradient(circle at 12% 24%, rgba(250, 204, 21, 0.08), transparent 55%),
+    linear-gradient(145deg, rgba(148, 163, 184, 0.05), transparent);
   border-radius: 1.25rem;
   border: 1px solid var(--border);
-  padding: clamp(0.75rem, 1vw, 1.25rem);
+  padding: clamp(1rem, 1.2vw, 1.75rem);
   box-shadow: 0 16px 45px -35px rgba(15, 23, 42, 0.6);
 }
 
