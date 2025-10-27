@@ -8,7 +8,7 @@ const MACRO_DEFINITIONS = [
 
 const MARKET_DEFINITIONS = [
   { key: "^GSPC", label: "S&P 500", color: "#22c55e" },
-  { key: "^IXIC", label: "NASDAQ 100", color: "#3b82f6" },
+  { key: "^IXIC", label: "NASDAQ Composite", color: "#3b82f6" },
   { key: "GLD", label: "Gold (GLD)", color: "#facc15" },
   { key: "TLT", label: "Treasury (TLT)", color: "#6366f1" },
   { key: "UUP", label: "USD (UUP)", color: "#0ea5e9" },
@@ -27,7 +27,7 @@ const state = {
     rebase: true,
     logScale: false,
     showAnnotations: true,
-    smoothLines: true,
+    smoothLines: false,
     startDate: null,
     endDate: null
   },
@@ -380,10 +380,19 @@ function prepareMacroSeries(xAxisIndex, yAxisIndex) {
   });
 }
 
+function getBaselineMarketDefinition(selected) {
+  if (!selected.length) return null;
+  const preferred = selected.find((def) => def.key === "^GSPC");
+  return preferred || selected[0];
+}
+
 function prepareMarketSeries(xAxisIndex, yAxisIndex) {
   const start = state.selections.startDate;
   const end = state.selections.endDate;
-  return MARKET_DEFINITIONS.filter((def) => state.selections.markets.has(def.key)).map((def) => {
+  const selected = MARKET_DEFINITIONS.filter((def) => state.selections.markets.has(def.key));
+  const baselineDef = getBaselineMarketDefinition(selected);
+
+  const series = selected.map((def) => {
     const rawSeries = state.data.prices[def.key] || [];
     const filtered = filterSeriesByDate(rawSeries, start, end);
     const data = state.selections.rebase ? rebaseSeries(filtered) : toPairs(filtered);
@@ -401,27 +410,41 @@ function prepareMarketSeries(xAxisIndex, yAxisIndex) {
       data
     };
   });
+  let baseline = [];
+  if (baselineDef) {
+    const rawSeries = state.data.prices[baselineDef.key] || [];
+    const filtered = filterSeriesByDate(rawSeries, start, end);
+    baseline = state.selections.rebase ? rebaseSeries(filtered) : toPairs(filtered);
+  }
+  return { series, baseline };
 }
 
-function clusterEvents(minGapDays = 10) {
-  const events = [...state.data.events];
-  events.sort((a, b) => new Date(a.date) - new Date(b.date));
+function clusterEvents(minGapDays = 30) {
+  if (!state.selections.startDate || !state.selections.endDate) return [];
+  const startTs = state.selections.startDate.getTime();
+  const endTs = state.selections.endDate.getTime();
+
+  const events = state.data.events
+    .map((event) => ({ ...event, timestamp: new Date(event.date).getTime() }))
+    .filter((event) => event.timestamp >= startTs && event.timestamp <= endTs)
+    .sort((a, b) => a.timestamp - b.timestamp);
   const clusters = [];
   events.forEach((event) => {
-    const timestamp = new Date(event.date).getTime();
+    const { timestamp, ...details } = event;
+    const payload = { ...details };
     const lastCluster = clusters[clusters.length - 1];
     if (lastCluster) {
       const gap = Math.abs(timestamp - lastCluster.timestamp);
       if (gap <= minGapDays * 24 * 60 * 60 * 1000) {
-        lastCluster.events.push(event);
+        lastCluster.events.push(payload);
         return;
       }
     }
-    clusters.push({ timestamp, events: [event] });
+    clusters.push({ timestamp, events: [payload] });
   });
   return clusters.map((cluster) => {
     const [first] = cluster.events;
-    const label = cluster.events.length > 1 ? `${first.title} +${cluster.events.length - 1} more` : first.title;
+    const label = first.title;
     return {
       timestamp: cluster.timestamp,
       label,
@@ -430,20 +453,81 @@ function clusterEvents(minGapDays = 10) {
   });
 }
 
-function prepareEventSeries(theme, xAxisIndex, yAxisIndex) {
-  const clusters = clusterEvents();
-  const scatterData = clusters.map((cluster) => ({
-    value: [cluster.timestamp, 1],
-    label: cluster.label,
-    events: cluster.events
-  }));
+function findClosestValue(series, timestamp) {
+  if (!series?.length) return null;
+  let closestValue = null;
+  let smallestDelta = Infinity;
+  for (let index = 0; index < series.length; index += 1) {
+    const [time, value] = series[index];
+    if (value === null || Number.isNaN(value)) continue;
+    const delta = Math.abs(time - timestamp);
+    if (delta < smallestDelta) {
+      smallestDelta = delta;
+      closestValue = value;
+    } else if (time > timestamp) {
+      break;
+    }
+  }
+  return closestValue;
+}
 
-  const lineData = clusters.map((cluster) => ({
-    coords: [
-      [cluster.timestamp, 0],
-      [cluster.timestamp, 1]
-    ]
-  }));
+function formatEventLabel(cluster) {
+  const [first] = cluster.events;
+  const date = new Date(first.date).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short"
+  });
+  if (cluster.events.length > 1) {
+    return `${cluster.label}\n${date} · +${cluster.events.length - 1} more`;
+  }
+  return `${cluster.label}\n${date}`;
+}
+
+function prepareEventSeries(theme, xAxisIndex, yAxisIndex, baseline) {
+  if (!state.selections.showAnnotations) return null;
+  const clusters = clusterEvents();
+  if (!baseline?.length || !clusters.length) {
+    return null;
+  }
+
+  const numericBaseline = baseline.filter(([, value]) => value !== null && !Number.isNaN(value));
+  if (!numericBaseline.length) return null;
+
+  const values = numericBaseline.map(([, value]) => value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = Math.max(max - min, Math.abs(max) * 0.15, 1);
+  const offsets = [1.2, 1.7, 2.3];
+
+  const scatterData = [];
+  const lineData = [];
+
+  clusters.forEach((cluster, index) => {
+    const baseValue = findClosestValue(numericBaseline, cluster.timestamp);
+    if (baseValue === null || baseValue === undefined) return;
+    const offsetMultiplier = offsets[index % offsets.length];
+    const targetValue = state.selections.logScale
+      ? baseValue * (1 + offsetMultiplier * 0.18)
+      : baseValue + range * offsetMultiplier * 0.12;
+    const label = formatEventLabel(cluster);
+    scatterData.push({
+      value: [cluster.timestamp, targetValue],
+      label,
+      events: cluster.events,
+      anchor: baseValue
+    });
+    lineData.push({
+      coords: [
+        [cluster.timestamp, baseValue],
+        [
+          cluster.timestamp,
+          state.selections.logScale ? targetValue * 0.92 : targetValue - range * 0.04
+        ]
+      ]
+    });
+  });
+
+  if (!scatterData.length) return null;
 
   return {
     stems: {
@@ -454,12 +538,12 @@ function prepareEventSeries(theme, xAxisIndex, yAxisIndex) {
       coordinateSystem: "cartesian2d",
       xAxisIndex,
       yAxisIndex,
-      zlevel: 1,
+      zlevel: 2,
       lineStyle: {
         color: theme.accent,
         width: 1.2,
         type: "dashed",
-        opacity: 0.6
+        opacity: 0.65
       },
       data: lineData,
       tooltip: { show: false }
@@ -469,26 +553,47 @@ function prepareEventSeries(theme, xAxisIndex, yAxisIndex) {
       type: "scatter",
       xAxisIndex,
       yAxisIndex,
-      symbolSize: 16,
+      symbol: "circle",
+      symbolSize: 18,
+      zlevel: 3,
       data: scatterData,
       label: {
-        show: state.selections.showAnnotations,
+        show: true,
         position: "top",
+        distance: 12,
         align: "center",
         color: theme.textColor,
-        backgroundColor: `${theme.accent}22`,
+        backgroundColor: `${theme.accent}1a`,
         borderColor: theme.accent,
         borderWidth: 1,
-        borderRadius: 6,
-        padding: [4, 8],
-        formatter: (params) => params.data.label,
-        overflow: "break"
+        borderRadius: 12,
+        padding: [8, 12],
+        fontSize: 12,
+        lineHeight: 18,
+        rich: {
+          title: {
+            fontSize: 12,
+            fontWeight: 600,
+            color: theme.textColor,
+            lineHeight: 18
+          },
+          subtitle: {
+            fontSize: 11,
+            color: theme.mutedColor,
+            lineHeight: 16
+          }
+        },
+        formatter: (params) => {
+          const raw = params.data.label || "";
+          const [title, subtitle] = raw.split("\n");
+          return `{title|${title}}\n{subtitle|${subtitle || ""}}`;
+        }
       },
       labelLayout: { moveOverlap: "shiftY" },
       itemStyle: {
         color: theme.accent,
         borderColor: theme.backgroundColor,
-        borderWidth: 1.4
+        borderWidth: 2
       },
       tooltip: { show: false }
     }
@@ -528,9 +633,8 @@ function refreshCharts() {
   const end = state.selections.endDate.getTime();
 
   const gridConfigs = [
-    { top: 96, height: 78, left: 80, right: 80, containLabel: true },
-    { top: 204, height: 150, left: 80, right: 80, containLabel: true },
-    { top: 388, height: 190, left: 80, right: 80, containLabel: true }
+    { top: 96, height: "56%", left: 80, right: 110, containLabel: true },
+    { bottom: 120, height: "26%", left: 80, right: 110, containLabel: true }
   ];
 
   const xAxes = gridConfigs.map((grid, index) => ({
@@ -553,12 +657,18 @@ function refreshCharts() {
 
   const yAxes = [
     {
-      type: "value",
+      type: state.selections.logScale ? "log" : "value",
       gridIndex: 0,
-      min: 0,
-      max: 1.1,
-      show: false,
-      splitLine: { show: false }
+      name: state.selections.rebase ? "Market indices (rebased)" : "Market indices",
+      nameLocation: "middle",
+      nameGap: 60,
+      axisLabel: {
+        color: theme.mutedColor,
+        formatter: (value) =>
+          state.selections.rebase ? Number(value).toFixed(0) : formatNumber(Number(value))
+      },
+      axisLine: { lineStyle: { color: theme.borderColor } },
+      splitLine: { lineStyle: { color: `${theme.borderColor}33` } }
     },
     {
       type: "value",
@@ -569,32 +679,18 @@ function refreshCharts() {
       axisLabel: { color: theme.mutedColor },
       axisLine: { lineStyle: { color: theme.borderColor } },
       splitLine: { lineStyle: { color: `${theme.borderColor}44` } }
-    },
-    {
-      type: state.selections.logScale ? "log" : "value",
-      gridIndex: 2,
-      name: state.selections.rebase ? "Markets (rebased = 100)" : "Markets",
-      nameLocation: "middle",
-      nameGap: 64,
-      axisLabel: {
-        color: theme.mutedColor,
-        formatter: (value) =>
-          state.selections.rebase ? Number(value).toFixed(0) : formatNumber(Number(value))
-      },
-      axisLine: { lineStyle: { color: theme.borderColor } },
-      splitLine: { lineStyle: { color: `${theme.borderColor}44` } }
     }
   ];
 
-  const marketSeries = prepareMarketSeries(2, 2);
+  const { series: marketSeries, baseline } = prepareMarketSeries(0, 0);
   const macroSeries = prepareMacroSeries(1, 1);
-  const eventSeries = prepareEventSeries(theme, 0, 0);
+  const eventSeries = prepareEventSeries(theme, 0, 0, baseline);
 
   const legendEntries = Array.from(
     new Set([
-      ...macroSeries.map((series) => series.name),
       ...marketSeries.map((series) => series.name),
-      eventSeries.markers.name
+      ...(eventSeries ? [eventSeries.markers.name] : []),
+      ...macroSeries.map((series) => series.name)
     ])
   );
 
@@ -612,7 +708,7 @@ function refreshCharts() {
       },
       tooltip: {
         trigger: "axis",
-        axisPointer: { type: "cross", link: [{ xAxisIndex: [0, 1, 2] }] },
+        axisPointer: { type: "cross", link: [{ xAxisIndex: [0, 1] }] },
         backgroundColor: theme.backgroundColor,
         borderColor: theme.borderColor,
         textStyle: { color: theme.textColor },
@@ -634,7 +730,7 @@ function refreshCharts() {
               .join("");
 
           const macroItems = params.filter((item) => item.seriesType === "line" && item.yAxisIndex === 1);
-          const marketItems = params.filter((item) => item.seriesType === "line" && item.yAxisIndex === 2);
+          const marketItems = params.filter((item) => item.seriesType === "line" && item.yAxisIndex === 0);
           const eventItems = params.filter((item) => item.seriesType === "scatter" && item.data?.events?.length);
 
           const sections = [];
@@ -666,12 +762,16 @@ function refreshCharts() {
         }
       },
       dataZoom: [
-        { type: "inside", xAxisIndex: [0, 1, 2] },
-        { type: "slider", xAxisIndex: [0, 1, 2], brushSelect: false, bottom: 20, height: 24 }
+        { type: "inside", xAxisIndex: [0, 1] },
+        { type: "slider", xAxisIndex: [0, 1], brushSelect: false, bottom: 20, height: 24 }
       ],
       xAxis: xAxes,
       yAxis: yAxes,
-      series: [eventSeries.stems, eventSeries.markers, ...macroSeries, ...marketSeries]
+      series: [
+        ...marketSeries,
+        ...(eventSeries ? [eventSeries.stems, eventSeries.markers] : []),
+        ...macroSeries
+      ]
     },
     true
   );
