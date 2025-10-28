@@ -206,6 +206,46 @@ def build_macro(price_payload: Dict[str, List[Dict[str, Optional[float]]]]) -> D
     return macro
 
 
+def validate_recent_data(
+    payload: Dict[str, List[Dict[str, Optional[float]]]],
+    *,
+    dataset_name: str,
+    required_keys: Optional[List[str]] = None,
+    max_age_days: int = 5,
+) -> None:
+    keys_to_check = required_keys or list(payload.keys())
+    if not keys_to_check:
+        raise ValueError(f"No series specified for {dataset_name} validation")
+
+    cutoff = pd.Timestamp.utcnow().normalize() - pd.Timedelta(days=max_age_days)
+    missing: List[str] = []
+    stale: List[str] = []
+
+    for key in keys_to_check:
+        records = payload.get(key, [])
+        if not records:
+            missing.append(key)
+            continue
+
+        timestamps = [record.get("t") for record in records if record.get("t") is not None]
+        if not timestamps:
+            missing.append(key)
+            continue
+
+        latest_ts = pd.Timestamp(max(timestamps), unit="ms", tz="UTC").tz_convert(None)
+        if latest_ts.normalize() < cutoff:
+            stale.append(f"{key} (latest {latest_ts.date()})")
+
+    if missing or stale:
+        parts: List[str] = []
+        if missing:
+            parts.append(f"missing data for {', '.join(sorted(missing))}")
+        if stale:
+            parts.append(f"stale data for {', '.join(sorted(stale))}")
+        message = ", ".join(parts)
+        raise ValueError(f"{dataset_name} validation failed: {message}")
+
+
 def load_events() -> List[Dict[str, str]]:
     yaml_path = ROOT / "events.yaml"
     if not yaml_path.exists():
@@ -241,7 +281,13 @@ def write_json(name: str, payload) -> None:
 
 def main() -> None:
     prices = build_prices()
+    validate_recent_data(prices, dataset_name="prices")
     macro = build_macro(prices)
+    validate_recent_data(
+        macro,
+        dataset_name="macro",
+        required_keys=["VIX", "DXY", "TENY", "OIL"],
+    )
     events = load_events()
     if not events:
         raise RuntimeError("No events found. Please populate events.yaml with at least one entry.")
