@@ -8,7 +8,7 @@ const MACRO_DEFINITIONS = [
 
 const MARKET_DEFINITIONS = [
   { key: "^GSPC", label: "S&P 500", color: "#22c55e" },
-  { key: "^IXIC", label: "NASDAQ Composite", color: "#3b82f6" },
+  { key: "^NDX", label: "NASDAQ 100", color: "#3b82f6" },
   { key: "GLD", label: "Gold (GLD)", color: "#facc15" },
   { key: "TLT", label: "Treasury (TLT)", color: "#6366f1" },
   { key: "UUP", label: "USD (UUP)", color: "#0ea5e9" },
