@@ -30,7 +30,7 @@ SITE_DATA_DIR.mkdir(parents=True, exist_ok=True)
 PRICE_TICKERS: Dict[str, str] = {
     "^VIX": "^VIX",
     "^GSPC": "^GSPC",
-    "^IXIC": "^IXIC",
+    "^NDX": "^NDX",
     "GLD": "GLD",
     "TLT": "TLT",
     "UUP": "UUP",
