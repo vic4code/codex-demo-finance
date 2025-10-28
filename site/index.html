@@ -5,11 +5,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Narrative-Driven Market Timeline</title>
-  <meta name="description" content="Interactive narrative overlay that blends historic events, macro indicators, and market performance on a synchronized timeline." />
+  <meta name="description" content="Interactive narrative overlay that blends historic events with cross-asset benchmarks on a synchronized timeline." />
   <meta property="og:title" content="Narrative-Driven Market Timeline" />
-  <meta property="og:description" content="Historic events, macro indicators, and market assets connected on a synchronized timeline." />
+  <meta property="og:description" content="Historic events and cross-asset benchmarks connected on a synchronized timeline." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://example.com" />
+  <meta property="og:url" content="https://vic4code.github.io/codex-demo-finance/" />
   <meta property="og:image" content="https://dummyimage.com/1200x630/1f2933/f8fafc&text=Narrative+Timeline" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230f172a'/><path d='M22 72L40 36l18 20 20-40' fill='none' stroke='%23facc15' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
@@ -32,7 +32,7 @@
     };
   </script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js" integrity="sha512-KYkd2JtOQhFPP03Spw2fscdKN0tJFMCq6gWKaolSVn1sRD2Gdj0tC1ymjqUAw2L8ZdpQbTCDWGBN7QFY6ae0Hw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body id="top" class="bg-surface text-foreground min-h-screen flex flex-col" data-theme-mode="auto">
@@ -47,7 +47,7 @@
           </span>
           <div>
             <h1 class="text-lg sm:text-xl font-semibold tracking-tight">Narrative-Driven Market Timeline</h1>
-            <p class="text-xs sm:text-sm text-muted">Historic catalysts aligned with macro and market momentum.</p>
+            <p class="text-xs sm:text-sm text-muted">Historic catalysts aligned with cross-asset momentum.</p>
           </div>
         </div>
         <nav class="hidden md:flex items-center gap-4 text-sm font-medium">
@@ -78,8 +78,8 @@
         <div class="grid gap-8 md:grid-cols-[minmax(0,1fr),320px]">
           <div>
             <p class="text-sm uppercase tracking-[0.2em] text-muted mb-4">Narrative Intelligence</p>
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight mb-6">Connect historic catalysts with macro stress and market positioning.</h2>
-            <p class="text-base md:text-lg text-muted max-w-2xl">Explore a synchronized triple-layer timeline that overlays curated events, high-frequency macro indicators, and multi-asset benchmarks. Zoom, filter, and annotate the storyline to surface cause-effect dynamics.</p>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight mb-6">Connect historic catalysts with cross-asset performance.</h2>
+            <p class="text-base md:text-lg text-muted max-w-2xl">Explore a synchronized timeline that overlays curated events with S&amp;P 500, gold, Treasuries, and bitcoin performance. Zoom, filter, and annotate the storyline to surface cause-effect dynamics.</p>
             <div class="mt-8 flex flex-wrap items-center gap-3">
               <a class="inline-flex items-center gap-2 rounded-full bg-foreground text-surface px-4 py-2 text-sm font-semibold hover:bg-accent hover:text-surface transition" href="#visualization">View Visualization</a>
               <a class="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground hover:border-accent" href="https://github.com/vic4code/codex-demo-finance" target="_blank" rel="noopener">Explore Source</a>
@@ -90,7 +90,7 @@
               <div class="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-muted"></div>
               <div class="relative p-6">
                 <h3 class="text-lg font-semibold mb-2">Design philosophy</h3>
-                <p class="text-sm text-muted">Narratives, macro, and markets rarely move in isolation. This dashboard aligns three lenses—events, macro stress, and multi-asset performance—to support daily storytelling and risk briefings.</p>
+                <p class="text-sm text-muted">Narratives and markets rarely move in isolation. This dashboard aligns two lenses—historic catalysts and cross-asset performance—to support daily storytelling and risk briefings.</p>
                 <ul class="mt-4 space-y-2 text-sm text-muted">
                   <li class="flex items-start gap-2"><span class="mt-1 h-2 w-2 rounded-full bg-accent"></span><span>Auto-updated via GitHub Actions every Asia/Taipei morning.</span></li>
                   <li class="flex items-start gap-2"><span class="mt-1 h-2 w-2 rounded-full bg-accent"></span><span>Graceful offline fallback with bundled sample datasets.</span></li>
@@ -128,24 +128,10 @@
             <article class="space-y-10">
               <section>
                 <header class="mb-4">
-                  <h3 class="text-lg font-semibold">Events Layer</h3>
-                  <p class="text-sm text-muted">Key narrative catalysts highlighted with smart label clustering.</p>
+                  <h3 class="text-lg font-semibold">Unified narrative timeline</h3>
+                  <p class="text-sm text-muted">Markets and curated events now share a single synchronized canvas with layered tooltips.</p>
                 </header>
-                <div id="events-chart" class="chart-panel" role="img" aria-label="Timeline of curated events"></div>
-              </section>
-              <section>
-                <header class="mb-4">
-                  <h3 class="text-lg font-semibold">Macro Layer</h3>
-                  <p class="text-sm text-muted">Volatility, rates, and global liquidity markers with synchronized zoom.</p>
-                </header>
-                <div id="macro-chart" class="chart-panel" role="img" aria-label="Macro indicators chart"></div>
-              </section>
-              <section>
-                <header class="mb-4">
-                  <h3 class="text-lg font-semibold">Markets Layer</h3>
-                  <p class="text-sm text-muted">Cross-asset performance rebased to 100 for clean relative comparisons.</p>
-                </header>
-                <div id="markets-chart" class="chart-panel" role="img" aria-label="Market assets chart"></div>
+                <div id="timeline-chart" class="chart-panel" role="img" aria-label="Combined timeline of cross-asset markets and events"></div>
               </section>
             </article>
           </div>
@@ -158,7 +144,7 @@
         <div class="grid gap-10 lg:grid-cols-2">
           <div>
             <h2 class="text-2xl md:text-3xl font-semibold mb-4">Why narrative layering matters</h2>
-            <p class="text-muted text-base leading-relaxed">Markets respond to the interaction of human narratives, policy expectations, and cross-asset liquidity. This lightweight explorer centralizes the storyline by synchronizing macro stress gauges, global risk proxies, and news catalysts. Use it to brief teams, annotate turning points, or sanity-check price moves.</p>
+            <p class="text-muted text-base leading-relaxed">Markets respond to the interaction of human narratives, policy expectations, and cross-asset liquidity. This lightweight explorer centralizes the storyline by synchronizing core benchmarks and news catalysts. Use it to brief teams, annotate turning points, or sanity-check price moves.</p>
             <p class="text-muted text-base leading-relaxed mt-4">Data refreshes daily through GitHub Actions. When live data cannot be reached, cached samples are displayed with a subtle banner. Custom events can be edited through <code>events.yaml</code>, supporting translations to English automatically.</p>
           </div>
           <div class="space-y-6">

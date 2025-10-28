@@ -9,15 +9,6 @@ const SAMPLE_DATA = {
       { t: 1685577600000, v: 4450.38 },
       { t: 1688169600000, v: 4511.89 }
     ],
-    "^NDX": [
-      { t: 1672444800000, v: 10986.99 },
-      { t: 1675036800000, v: 12237.32 },
-      { t: 1677628800000, v: 12128.27 },
-      { t: 1680307200000, v: 13281.21 },
-      { t: 1682899200000, v: 13142.49 },
-      { t: 1685577600000, v: 14665.88 },
-      { t: 1688169600000, v: 15038.16 }
-    ],
     GLD: [
       { t: 1672444800000, v: 168.15 },
       { t: 1675036800000, v: 179.31 },
@@ -36,15 +27,6 @@ const SAMPLE_DATA = {
       { t: 1685577600000, v: 102.53 },
       { t: 1688169600000, v: 100.07 }
     ],
-    UUP: [
-      { t: 1672444800000, v: 27.8 },
-      { t: 1675036800000, v: 28.15 },
-      { t: 1677628800000, v: 27.58 },
-      { t: 1680307200000, v: 27.98 },
-      { t: 1682899200000, v: 27.61 },
-      { t: 1685577600000, v: 27.68 },
-      { t: 1688169600000, v: 28.27 }
-    ],
     "BTC-USD": [
       { t: 1672444800000, v: 16547.5 },
       { t: 1675036800000, v: 23126.41 },
@@ -53,62 +35,6 @@ const SAMPLE_DATA = {
       { t: 1682899200000, v: 28316.2 },
       { t: 1685577600000, v: 30466.96 },
       { t: 1688169600000, v: 30477.43 }
-    ],
-    "^VIX": [
-      { t: 1672444800000, v: 21.67 },
-      { t: 1675036800000, v: 19.85 },
-      { t: 1677628800000, v: 18.49 },
-      { t: 1680307200000, v: 19.02 },
-      { t: 1682899200000, v: 17.95 },
-      { t: 1685577600000, v: 13.44 },
-      { t: 1688169600000, v: 13.59 }
-    ]
-  },
-  macro: {
-    VIX: [
-      { t: 1672444800000, v: 21.67 },
-      { t: 1675036800000, v: 19.85 },
-      { t: 1677628800000, v: 18.49 },
-      { t: 1680307200000, v: 19.02 },
-      { t: 1682899200000, v: 17.95 },
-      { t: 1685577600000, v: 13.44 },
-      { t: 1688169600000, v: 13.59 }
-    ],
-    DXY: [
-      { t: 1672444800000, v: 103.44 },
-      { t: 1675036800000, v: 102.06 },
-      { t: 1677628800000, v: 105.21 },
-      { t: 1680307200000, v: 102.06 },
-      { t: 1682899200000, v: 104.04 },
-      { t: 1685577600000, v: 103.27 },
-      { t: 1688169600000, v: 102.92 }
-    ],
-    TENY: [
-      { t: 1672444800000, v: 3.88 },
-      { t: 1675036800000, v: 3.53 },
-      { t: 1677628800000, v: 3.96 },
-      { t: 1680307200000, v: 3.47 },
-      { t: 1682899200000, v: 3.57 },
-      { t: 1685577600000, v: 3.81 },
-      { t: 1688169600000, v: 3.84 }
-    ],
-    CPI_YoY: [
-      { t: 1669852800000, v: 7.1 },
-      { t: 1672444800000, v: 6.5 },
-      { t: 1675123200000, v: 6.4 },
-      { t: 1677628800000, v: 6.0 },
-      { t: 1680307200000, v: 4.9 },
-      { t: 1682899200000, v: 4.0 },
-      { t: 1685577600000, v: 3.0 }
-    ],
-    OIL: [
-      { t: 1672444800000, v: 79.65 },
-      { t: 1675036800000, v: 74.47 },
-      { t: 1677628800000, v: 76.32 },
-      { t: 1680307200000, v: 75.67 },
-      { t: 1682899200000, v: 71.74 },
-      { t: 1685577600000, v: 69.93 },
-      { t: 1688169600000, v: 80.72 }
     ]
   },
   events: [
@@ -122,36 +48,24 @@ const SAMPLE_DATA = {
   ]
 };
 
-const MACRO_DEFINITIONS = [
-  { key: "VIX", label: "VIX", color: "#f97316" },
-  { key: "TENY", label: "US 10Y Yield", color: "#22d3ee" },
-  { key: "DXY", label: "DXY Dollar Index", color: "#38bdf8" },
-  { key: "CPI_YoY", label: "CPI YoY", color: "#f43f5e" },
-  { key: "OIL", label: "WTI Crude", color: "#a855f7" }
-];
-
 const MARKET_DEFINITIONS = [
   { key: "^GSPC", label: "S&P 500", color: "#22c55e" },
-  { key: "^NDX", label: "NASDAQ 100", color: "#3b82f6" },
   { key: "GLD", label: "Gold (GLD)", color: "#facc15" },
   { key: "TLT", label: "Treasury (TLT)", color: "#6366f1" },
-  { key: "UUP", label: "USD (UUP)", color: "#0ea5e9" },
   { key: "BTC-USD", label: "Bitcoin", color: "#f97316" }
 ];
 
 const state = {
   data: {
     prices: {},
-    macro: {},
     events: []
   },
   selections: {
-    macros: new Set(["VIX", "TENY", "DXY"]),
-    markets: new Set(["^GSPC", "GLD", "TLT", "UUP", "BTC-USD"]),
-    rebase: true,
+    markets: new Set(["^GSPC", "GLD", "TLT", "BTC-USD"]),
+    rebase: false,
     logScale: false,
     showAnnotations: true,
-    smoothLines: true,
+    smoothLines: false,
     startDate: null,
     endDate: null
   },
@@ -159,52 +73,62 @@ const state = {
 };
 
 const charts = {
-  events: null,
-  macro: null,
-  markets: null
+  timeline: null
 };
 
-async function fetchDataset(name, fallback) {
+async function fetchDataset(name) {
   const basePaths = [
     `../data/${name}.json`,
     `./data/${name}.json`,
+    `data/${name}.json`,
     `${name}.json`
   ];
   for (const path of basePaths) {
     try {
       const response = await fetch(path, { cache: "no-cache" });
       if (response.ok) {
-        return { data: await response.json(), usedFallback: false };
+        return { data: await response.json(), message: null };
       }
     } catch (error) {
       // Continue to next path
     }
   }
-  state.fallbackMessages.push(`Live ${name} feed unavailable. Showing cached sample.`);
-  return { data: fallback, usedFallback: true };
+  return {
+    data: null,
+    message: `Unable to load ${name} dataset from the bundled data directory.`
+  };
 }
 
 async function loadData() {
   state.fallbackMessages = [];
-  const [prices, macro, events] = await Promise.all([
-    fetchDataset("prices", SAMPLE_DATA.prices),
-    fetchDataset("macro", SAMPLE_DATA.macro),
-    fetchDataset("events", SAMPLE_DATA.events)
+  const [prices, events] = await Promise.all([
+    fetchDataset("prices"),
+    fetchDataset("events")
   ]);
 
   state.data.prices = prices.data || {};
-  state.data.macro = macro.data || {};
-  state.data.events = Array.isArray(events.data) ? events.data : SAMPLE_DATA.events;
+  state.data.events = Array.isArray(events.data) ? events.data : [];
+
+  [prices, events]
+    .filter((result) => result.message)
+    .forEach((result) => state.fallbackMessages.push(result.message));
+
+  if (!Object.keys(state.data.prices).length) {
+    state.data.prices = SAMPLE_DATA.prices;
+    state.fallbackMessages.push("Live prices feed unavailable. Showing cached sample data.");
+  }
+
+  if (!state.data.events.length) {
+    state.data.events = SAMPLE_DATA.events;
+    state.fallbackMessages.push("Event annotations fallback to bundled sample.");
+  }
 
   initializeDateRange();
   showFallbackBanner();
 }
 
 function initializeDateRange() {
-  const allSeries = [
-    ...Object.values(state.data.prices || {}),
-    ...Object.values(state.data.macro || {})
-  ].filter(Boolean);
+  const allSeries = [...Object.values(state.data.prices || {})].filter(Boolean);
   const timestamps = allSeries.flat().map((point) => point.t);
   if (!timestamps.length) {
     const now = Date.now();
@@ -280,8 +204,7 @@ function setupControls() {
 
   const factories = [
     () => buildDateRangeControls(),
-    () => buildCheckboxGroup("Macro indicators", "macros", MACRO_DEFINITIONS, state.selections.macros),
-    () => buildCheckboxGroup("Market assets", "markets", MARKET_DEFINITIONS, state.selections.markets),
+    () => buildCheckboxGroup("Market benchmarks", "markets", MARKET_DEFINITIONS, state.selections.markets),
     () => buildToggleGroup()
   ];
 
@@ -478,36 +401,27 @@ function toPairs(series) {
   return series.map((point) => [point.t, point.v]);
 }
 
-function prepareMacroSeries() {
-  const start = state.selections.startDate;
-  const end = state.selections.endDate;
-  return MACRO_DEFINITIONS.filter((def) => state.selections.macros.has(def.key)).map((def) => {
-    const rawSeries = state.data.macro[def.key] || [];
-    const filtered = filterSeriesByDate(rawSeries, start, end);
-    return {
-      name: def.label,
-      type: "line",
-      smooth: state.selections.smoothLines,
-      showSymbol: false,
-      emphasis: { focus: "series" },
-      connectNulls: true,
-      itemStyle: { color: def.color },
-      lineStyle: { width: 2 },
-      data: toPairs(filtered)
-    };
-  });
+function getBaselineMarketDefinition(selected) {
+  if (!selected.length) return null;
+  const preferred = selected.find((def) => def.key === "^GSPC");
+  return preferred || selected[0];
 }
 
-function prepareMarketSeries() {
+function prepareMarketSeries(xAxisIndex, yAxisIndex) {
   const start = state.selections.startDate;
   const end = state.selections.endDate;
-  return MARKET_DEFINITIONS.filter((def) => state.selections.markets.has(def.key)).map((def) => {
+  const selected = MARKET_DEFINITIONS.filter((def) => state.selections.markets.has(def.key));
+  const baselineDef = getBaselineMarketDefinition(selected);
+
+  const series = selected.map((def) => {
     const rawSeries = state.data.prices[def.key] || [];
     const filtered = filterSeriesByDate(rawSeries, start, end);
     const data = state.selections.rebase ? rebaseSeries(filtered) : toPairs(filtered);
     return {
       name: def.label,
       type: "line",
+      xAxisIndex,
+      yAxisIndex,
       smooth: state.selections.smoothLines,
       showSymbol: false,
       emphasis: { focus: "series" },
@@ -517,27 +431,41 @@ function prepareMarketSeries() {
       data
     };
   });
+  let baseline = [];
+  if (baselineDef) {
+    const rawSeries = state.data.prices[baselineDef.key] || [];
+    const filtered = filterSeriesByDate(rawSeries, start, end);
+    baseline = state.selections.rebase ? rebaseSeries(filtered) : toPairs(filtered);
+  }
+  return { series, baseline };
 }
 
-function clusterEvents(minGapDays = 10) {
-  const events = [...state.data.events];
-  events.sort((a, b) => new Date(a.date) - new Date(b.date));
+function clusterEvents(minGapDays = 30) {
+  if (!state.selections.startDate || !state.selections.endDate) return [];
+  const startTs = state.selections.startDate.getTime();
+  const endTs = state.selections.endDate.getTime();
+
+  const events = state.data.events
+    .map((event) => ({ ...event, timestamp: new Date(event.date).getTime() }))
+    .filter((event) => event.timestamp >= startTs && event.timestamp <= endTs)
+    .sort((a, b) => a.timestamp - b.timestamp);
   const clusters = [];
   events.forEach((event) => {
-    const timestamp = new Date(event.date).getTime();
+    const { timestamp, ...details } = event;
+    const payload = { ...details };
     const lastCluster = clusters[clusters.length - 1];
     if (lastCluster) {
       const gap = Math.abs(timestamp - lastCluster.timestamp);
       if (gap <= minGapDays * 24 * 60 * 60 * 1000) {
-        lastCluster.events.push(event);
+        lastCluster.events.push(payload);
         return;
       }
     }
-    clusters.push({ timestamp, events: [event] });
+    clusters.push({ timestamp, events: [payload] });
   });
   return clusters.map((cluster) => {
     const [first] = cluster.events;
-    const label = cluster.events.length > 1 ? `${first.title} +${cluster.events.length - 1} more` : first.title;
+    const label = first.title;
     return {
       timestamp: cluster.timestamp,
       label,
@@ -546,42 +474,165 @@ function clusterEvents(minGapDays = 10) {
   });
 }
 
-function prepareEventSeries() {
-  const clusters = clusterEvents();
-  const scatterData = clusters.map((cluster) => ({
-    value: [cluster.timestamp, 1],
-    label: cluster.label,
-    events: cluster.events
-  }));
+function findClosestValue(series, timestamp) {
+  if (!series?.length) return null;
+  let closestValue = null;
+  let smallestDelta = Infinity;
+  for (let index = 0; index < series.length; index += 1) {
+    const [time, value] = series[index];
+    if (value === null || Number.isNaN(value)) continue;
+    const delta = Math.abs(time - timestamp);
+    if (delta < smallestDelta) {
+      smallestDelta = delta;
+      closestValue = value;
+    } else if (time > timestamp) {
+      break;
+    }
+  }
+  return closestValue;
+}
 
-  const lineData = clusters.map((cluster) => ({
-    coords: [
-      [cluster.timestamp, 0],
-      [cluster.timestamp, 0.82]
-    ]
-  }));
+function formatEventLabel(cluster) {
+  const [first] = cluster.events;
+  const date = new Date(first.date).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short"
+  });
+  if (cluster.events.length > 1) {
+    return `${cluster.label}\n${date} · +${cluster.events.length - 1} more`;
+  }
+  return `${cluster.label}\n${date}`;
+}
+
+function prepareEventSeries(theme, xAxisIndex, yAxisIndex, baseline) {
+  if (!state.selections.showAnnotations) return null;
+  const clusters = clusterEvents();
+  if (!baseline?.length || !clusters.length) {
+    return null;
+  }
+
+  const numericBaseline = baseline.filter(([, value]) => value !== null && !Number.isNaN(value));
+  if (!numericBaseline.length) return null;
+
+  const values = numericBaseline.map(([, value]) => value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = Math.max(max - min, Math.abs(max) * 0.15, 1);
+  const offsets = [1.2, 1.7, 2.3];
+
+  const scatterData = [];
+  const lineData = [];
+
+  clusters.forEach((cluster, index) => {
+    const baseValue = findClosestValue(numericBaseline, cluster.timestamp);
+    if (baseValue === null || baseValue === undefined) return;
+    const offsetMultiplier = offsets[index % offsets.length];
+    const targetValue = state.selections.logScale
+      ? baseValue * (1 + offsetMultiplier * 0.18)
+      : baseValue + range * offsetMultiplier * 0.12;
+    const label = formatEventLabel(cluster);
+    scatterData.push({
+      value: [cluster.timestamp, targetValue],
+      label,
+      events: cluster.events,
+      anchor: baseValue
+    });
+    lineData.push({
+      coords: [
+        [cluster.timestamp, baseValue],
+        [
+          cluster.timestamp,
+          state.selections.logScale ? targetValue * 0.92 : targetValue - range * 0.04
+        ]
+      ]
+    });
+  });
+
+  if (!scatterData.length) return null;
 
   return {
-    scatterData,
-    lineData
+    stems: {
+      name: "Event stems",
+      type: "lines",
+      showInLegend: false,
+      silent: true,
+      coordinateSystem: "cartesian2d",
+      xAxisIndex,
+      yAxisIndex,
+      zlevel: 2,
+      lineStyle: {
+        color: theme.accent,
+        width: 1.2,
+        type: "dashed",
+        opacity: 0.65
+      },
+      data: lineData,
+      tooltip: { show: false }
+    },
+    markers: {
+      name: "Narrative events",
+      type: "scatter",
+      xAxisIndex,
+      yAxisIndex,
+      symbol: "circle",
+      symbolSize: 18,
+      zlevel: 3,
+      data: scatterData,
+      label: {
+        show: true,
+        position: "top",
+        distance: 12,
+        align: "center",
+        color: theme.textColor,
+        backgroundColor: `${theme.accent}1a`,
+        borderColor: theme.accent,
+        borderWidth: 1,
+        borderRadius: 12,
+        padding: [8, 12],
+        fontSize: 12,
+        lineHeight: 18,
+        rich: {
+          title: {
+            fontSize: 12,
+            fontWeight: 600,
+            color: theme.textColor,
+            lineHeight: 18
+          },
+          subtitle: {
+            fontSize: 11,
+            color: theme.mutedColor,
+            lineHeight: 16
+          }
+        },
+        formatter: (params) => {
+          const raw = params.data.label || "";
+          const [title, subtitle] = raw.split("\n");
+          return `{title|${title}}\n{subtitle|${subtitle || ""}}`;
+        }
+      },
+      labelLayout: { moveOverlap: "shiftY" },
+      itemStyle: {
+        color: theme.accent,
+        borderColor: theme.backgroundColor,
+        borderWidth: 2
+      },
+      tooltip: { show: false }
+    }
   };
 }
 
 function initCharts() {
-  charts.events = echarts.init(document.getElementById("events-chart"), null, { renderer: "canvas" });
-  charts.macro = echarts.init(document.getElementById("macro-chart"), null, { renderer: "canvas" });
-  charts.markets = echarts.init(document.getElementById("markets-chart"), null, { renderer: "canvas" });
+  const element = document.getElementById("timeline-chart");
+  if (element) {
+    charts.timeline = echarts.init(element, null, { renderer: "canvas" });
+  }
 
-  charts.events.group = "timeline-group";
-  charts.macro.group = "timeline-group";
-  charts.markets.group = "timeline-group";
-  echarts.connect("timeline-group");
-
-  window.addEventListener("resize", debounce(() => {
-    charts.events?.resize();
-    charts.macro?.resize();
-    charts.markets?.resize();
-  }, 150));
+  window.addEventListener(
+    "resize",
+    debounce(() => {
+      charts.timeline?.resize();
+    }, 150)
+  );
 }
 
 function getChartTheme() {
@@ -596,203 +647,133 @@ function getChartTheme() {
 }
 
 function refreshCharts() {
-  if (!charts.events || !charts.macro || !charts.markets) return;
+  if (!charts.timeline) return;
   if (!state.selections.startDate || !state.selections.endDate) return;
   const theme = getChartTheme();
   const start = state.selections.startDate.getTime();
   const end = state.selections.endDate.getTime();
 
-  const macroSeries = prepareMacroSeries();
-  const marketSeries = prepareMarketSeries();
-  const { scatterData, lineData } = prepareEventSeries();
+  const gridConfigs = [{ top: 88, bottom: 120, left: 80, right: 120, containLabel: true }];
 
-  charts.events.setOption(
+  const xAxes = [
+    {
+      type: "time",
+      gridIndex: 0,
+      min: start,
+      max: end,
+      axisLabel: { color: theme.mutedColor },
+      axisTick: { show: true },
+      axisLine: { lineStyle: { color: theme.borderColor } },
+      splitLine: { show: false },
+      axisPointer: { label: { color: theme.textColor, backgroundColor: theme.borderColor } }
+    }
+  ];
+
+  const yAxes = [
+    {
+      type: state.selections.logScale ? "log" : "value",
+      gridIndex: 0,
+      name: state.selections.rebase ? "Normalized performance" : "Asset prices",
+      nameLocation: "middle",
+      nameGap: 56,
+      axisLabel: {
+        color: theme.mutedColor,
+        formatter: (value) =>
+          state.selections.rebase ? Number(value).toFixed(0) : formatNumber(Number(value))
+      },
+      axisLine: { lineStyle: { color: theme.borderColor } },
+      splitLine: { lineStyle: { color: `${theme.borderColor}33` } }
+    }
+  ];
+
+  const { series: marketSeries, baseline } = prepareMarketSeries(0, 0);
+  const eventSeries = prepareEventSeries(theme, 0, 0, baseline);
+
+  const legendEntries = Array.from(
+    new Set([
+      ...marketSeries.map((series) => series.name),
+      ...(eventSeries ? [eventSeries.markers.name] : [])
+    ])
+  );
+
+  charts.timeline.setOption(
     {
       backgroundColor: theme.backgroundColor,
-      grid: { top: 28, left: 36, right: 24, bottom: 28 },
+      grid: gridConfigs,
+      legend: {
+        data: legendEntries,
+        textStyle: { color: theme.textColor },
+        top: 16,
+        icon: "circle",
+        itemGap: 16,
+        type: "scroll"
+      },
       tooltip: {
-        trigger: "item",
-        className: "event-tooltip",
+        trigger: "axis",
+        axisPointer: { type: "cross" },
         backgroundColor: theme.backgroundColor,
         borderColor: theme.borderColor,
         textStyle: { color: theme.textColor },
+        extraCssText: "box-shadow:0 12px 34px -20px rgba(15,23,42,0.5);border-radius:12px;padding:12px 16px;",
         formatter: (params) => {
-          const data = params.data;
-          if (!data?.events) return "";
-          const lines = data.events
-            .map((event) => `<strong>${event.title}</strong><br/><span class="text-muted">${event.brief}</span>`)
-            .join("<br/><br/>");
-          return `<div class="space-y-2"><div class="text-xs uppercase tracking-wide text-muted">${formatDateTooltip(
-            data.value[0]
-          )}</div>${lines}</div>`;
+          if (!params || !params.length) return "";
+          const axisValue = Number(params[0].axisValue);
+          const header = `<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.12em;color:${theme.mutedColor}">${formatDateTooltip(axisValue)}</div>`;
+
+          const buildRows = (items) =>
+            items
+              .map(
+                (item) => `
+                  <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;">
+                    <span style="display:flex;align-items:center;gap:6px;color:${item.color}">${item.marker || ""}${item.seriesName}</span>
+                    <span>${formatNumber(Number(item.value[1]))}</span>
+                  </div>`
+              )
+              .join("");
+
+          const marketItems = params.filter((item) => item.seriesType === "line" && item.yAxisIndex === 0);
+          const eventItems = params.filter((item) => item.seriesType === "scatter" && item.data?.events?.length);
+
+          const sections = [];
+          if (marketItems.length) {
+            sections.push(
+              `<div style="margin-top:12px"><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.16em;color:${theme.mutedColor}">Markets</div><div style="margin-top:6px;display:grid;gap:6px">${buildRows(marketItems)}</div></div>`
+            );
+          }
+          if (eventItems.length) {
+            const eventEntries = [];
+            eventItems.forEach((item) => {
+              item.data.events.forEach((event) => {
+                eventEntries.push(
+                  `<div style="padding:6px 0;border-bottom:1px solid ${theme.borderColor}"><strong style="display:block;font-size:0.75rem;margin-bottom:2px;">${event.title}</strong><span style="color:${theme.mutedColor};font-size:0.75rem;">${event.brief}</span></div>`
+                );
+              });
+            });
+            sections.push(
+              `<div style="margin-top:12px"><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.16em;color:${theme.mutedColor}">Events</div><div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">${eventEntries.join("")}</div></div>`
+            );
+          }
+
+          return `${header}${sections.join("")}`;
         }
       },
-      xAxis: {
-        type: "time",
-        min: start,
-        max: end,
-        axisLabel: { color: theme.mutedColor },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        axisPointer: {
-          label: { color: theme.textColor, backgroundColor: theme.borderColor }
-        }
-      },
-      yAxis: {
-        type: "value",
-        min: 0,
-        max: 1,
-        show: false
-      },
+      dataZoom: [
+        { type: "inside", xAxisIndex: [0] },
+        { type: "slider", xAxisIndex: [0], brushSelect: false, bottom: 24, height: 24 }
+      ],
+      xAxis: xAxes,
+      yAxis: yAxes,
       series: [
-        {
-          name: "Event stems",
-          type: "lines",
-          coordinateSystem: "cartesian2d",
-          zlevel: 1,
-          polyline: false,
-          data: lineData,
-          lineStyle: {
-            color: theme.accent,
-            width: 1.5,
-            type: "dashed"
-          }
-        },
-        {
-          name: "Events",
-          type: "scatter",
-          data: scatterData,
-          symbolSize: 14,
-          label: {
-            show: state.selections.showAnnotations,
-            position: "top",
-            align: "center",
-            color: theme.textColor,
-            backgroundColor: `${theme.accent}22`,
-            borderColor: theme.accent,
-            borderWidth: 1,
-            borderRadius: 6,
-            padding: [4, 8],
-            formatter: (params) => params.data.label,
-            overflow: "break"
-          },
-          itemStyle: {
-            color: theme.accent,
-            borderColor: theme.backgroundColor,
-            borderWidth: 1.5
-          }
-        }
+        ...marketSeries,
+        ...(eventSeries ? [eventSeries.stems, eventSeries.markers] : [])
       ]
-    },
-    true
-  );
-
-  charts.macro.setOption(
-    {
-      backgroundColor: theme.backgroundColor,
-      grid: { top: 32, left: 56, right: 56, bottom: 40 },
-      legend: {
-        data: macroSeries.map((series) => series.name),
-        textStyle: { color: theme.textColor },
-        top: 0
-      },
-      tooltip: {
-        trigger: "axis",
-        axisPointer: { type: "cross" },
-        backgroundColor: theme.backgroundColor,
-        borderColor: theme.borderColor,
-        textStyle: { color: theme.textColor },
-        formatter: (params) => {
-          if (!params || !params.length) return "";
-          const header = `<div class="text-xs uppercase tracking-wide text-muted">${formatDateTooltip(params[0].value[0])}</div>`;
-          const body = params
-            .map((item) => `
-              <div class="flex justify-between gap-8">
-                <span style="color:${item.color}">${item.seriesName}</span>
-                <span>${formatNumber(item.value[1])}</span>
-              </div>`)
-            .join("");
-          return `${header}${body}`;
-        }
-      },
-      dataZoom: [
-        { type: "inside", xAxisIndex: 0 },
-        { type: "slider", xAxisIndex: 0, brushSelect: false, bottom: 0, height: 20 }
-      ],
-      xAxis: {
-        type: "time",
-        min: start,
-        max: end,
-        axisLabel: { color: theme.mutedColor },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        axisPointer: { label: { color: theme.textColor, backgroundColor: theme.borderColor } }
-      },
-      yAxis: {
-        type: state.selections.logScale ? "log" : "value",
-        axisLabel: { color: theme.mutedColor },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        splitLine: { lineStyle: { color: `${theme.borderColor}55` } }
-      },
-      series: macroSeries
-    },
-    true
-  );
-
-  charts.markets.setOption(
-    {
-      backgroundColor: theme.backgroundColor,
-      grid: { top: 32, left: 56, right: 56, bottom: 40 },
-      legend: {
-        data: marketSeries.map((series) => series.name),
-        textStyle: { color: theme.textColor },
-        top: 0
-      },
-      tooltip: {
-        trigger: "axis",
-        axisPointer: { type: "cross" },
-        backgroundColor: theme.backgroundColor,
-        borderColor: theme.borderColor,
-        textStyle: { color: theme.textColor },
-        formatter: (params) => {
-          if (!params || !params.length) return "";
-          const header = `<div class="text-xs uppercase tracking-wide text-muted">${formatDateTooltip(params[0].value[0])}</div>`;
-          const body = params
-            .map((item) => `
-              <div class="flex justify-between gap-8">
-                <span style="color:${item.color}">${item.seriesName}</span>
-                <span>${formatNumber(item.value[1])}</span>
-              </div>`)
-            .join("");
-          return `${header}${body}`;
-        }
-      },
-      dataZoom: [
-        { type: "inside", xAxisIndex: 0 },
-        { type: "slider", xAxisIndex: 0, brushSelect: false, bottom: 0, height: 20 }
-      ],
-      xAxis: {
-        type: "time",
-        min: start,
-        max: end,
-        axisLabel: { color: theme.mutedColor },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        axisPointer: { label: { color: theme.textColor, backgroundColor: theme.borderColor } }
-      },
-      yAxis: {
-        type: state.selections.logScale ? "log" : "value",
-        axisLabel: {
-          color: theme.mutedColor,
-          formatter: (value) => (state.selections.rebase ? value.toFixed(0) : value)
-        },
-        axisLine: { lineStyle: { color: theme.borderColor } },
-        splitLine: { lineStyle: { color: `${theme.borderColor}55` } }
-      },
-      series: marketSeries
     },
     true
   );
 
   syncControlState();
 }
+
 
 function debounce(fn, delay = 200) {
   let timeout;
@@ -831,9 +812,6 @@ function syncControlState() {
     input.min = startValue;
   });
 
-  document.querySelectorAll("input[data-control='macros']").forEach((input) => {
-    input.checked = state.selections.macros.has(input.value);
-  });
   document.querySelectorAll("input[data-control='markets']").forEach((input) => {
     input.checked = state.selections.markets.has(input.value);
   });
