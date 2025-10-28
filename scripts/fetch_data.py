@@ -93,10 +93,15 @@ def fetch_history(ticker: str) -> pd.Series:
     price_col = "Adj Close" if "Adj Close" in history else "Close"
     series = history[price_col].dropna()
     series.index = series.index.tz_localize(None)
+    cutoff = pd.Timestamp.utcnow().normalize()
+    series = series[series.index <= cutoff]
     return series
 
 
 def series_to_records(series: pd.Series) -> List[Dict[str, Optional[float]]]:
+    series = series.sort_index()
+    cutoff = pd.Timestamp.utcnow().normalize()
+    series = series[series.index <= cutoff]
     records: List[Dict[str, Optional[float]]] = []
     for timestamp, value in series.items():
         if pd.isna(value):
@@ -110,14 +115,20 @@ def series_to_records(series: pd.Series) -> List[Dict[str, Optional[float]]]:
 
 def build_prices() -> Dict[str, List[Dict[str, Optional[float]]]]:
     output: Dict[str, List[Dict[str, Optional[float]]]] = {}
+    missing: List[str] = []
     for name, ticker in PRICE_TICKERS.items():
         print(f"Downloading price series for {name} ({ticker})...")
         series = fetch_history(ticker)
         if series.empty:
             print(f"Warning: No data for {ticker}")
+            missing.append(name)
             output[name] = []
         else:
             output[name] = series_to_records(series)
+    if missing:
+        raise RuntimeError(
+            "Missing price data for: " + ", ".join(missing)
+        )
     return output
 
 
@@ -131,10 +142,14 @@ def build_macro(price_payload: Dict[str, List[Dict[str, Optional[float]]]]) -> D
     dxy_series = fetch_history(MACRO_TICKERS["DXY"])
     if dxy_series.empty:
         dxy_series = fetch_history("DXY")
+    if dxy_series.empty:
+        print("Warning: No data for DXY")
     macro["DXY"] = series_to_records(dxy_series) if not dxy_series.empty else []
 
     # Crude oil front-month via Yahoo Finance
     oil_series = fetch_history(MACRO_TICKERS["OIL"])
+    if oil_series.empty:
+        print("Warning: No data for crude oil")
     macro["OIL"] = series_to_records(oil_series) if not oil_series.empty else []
 
     fred_key = os.getenv("FRED_API_KEY")
@@ -160,6 +175,8 @@ def build_macro(price_payload: Dict[str, List[Dict[str, Optional[float]]]]) -> D
     if not ten_year_records:
         print("Falling back to Yahoo Finance for 10Y yield (^TNX)...")
         tnx_series = fetch_history(MACRO_TICKERS["TENY_FALLBACK"])
+        if tnx_series.empty:
+            print("Warning: No data for 10Y yield fallback (^TNX)")
         ten_year_records = series_to_records(tnx_series / 100.0) if not tnx_series.empty else []
     macro["TENY"] = ten_year_records
 
@@ -182,13 +199,17 @@ def build_macro(price_payload: Dict[str, List[Dict[str, Optional[float]]]]) -> D
     for key in ["VIX", "DXY", "TENY", "CPI_YoY", "OIL"]:
         macro.setdefault(key, [])
 
+    required = [key for key in ["VIX", "DXY", "TENY", "OIL"] if not macro.get(key)]
+    if required:
+        raise RuntimeError("Missing macro data for: " + ", ".join(required))
+
     return macro
 
 
 def load_events() -> List[Dict[str, str]]:
     yaml_path = ROOT / "events.yaml"
     if not yaml_path.exists():
-        return SAMPLE_EVENTS
+        raise RuntimeError("events.yaml is missing. Please add at least one event.")
     with yaml_path.open("r", encoding="utf-8") as handle:
         events_raw = yaml.safe_load(handle) or []
     events: List[Dict[str, str]] = []
@@ -205,18 +226,8 @@ def load_events() -> List[Dict[str, str]]:
         if not date_str:
             continue
         events.append({"date": date_str, "title": title, "brief": brief})
+    events.sort(key=lambda item: item["date"])
     return events
-
-
-SAMPLE_EVENTS = [
-    {"date": "2000-03-10", "title": "Dot-com bubble peak", "brief": "NASDAQ peaked and entered a prolonged correction."},
-    {"date": "2001-09-11", "title": "9/11 attacks", "brief": "Terrorist attacks in the U.S. shocked global markets."},
-    {"date": "2008-09-15", "title": "Lehman Brothers collapse", "brief": "Catalyst of the global financial crisis."},
-    {"date": "2018-02-05", "title": "Volmageddon", "brief": "Inverse VIX ETNs imploded amid a volatility spike."},
-    {"date": "2020-03-16", "title": "COVID-19 circuit breaker", "brief": "Market meltdown and policy bazooka followed."},
-    {"date": "2022-02-24", "title": "Russia–Ukraine war", "brief": "Risk-off flows to USD and commodities."},
-    {"date": "2023-03-10", "title": "SVB collapse", "brief": "Banking stress revived recession fears."},
-]
 
 
 def write_json(name: str, payload) -> None:
@@ -233,7 +244,7 @@ def main() -> None:
     macro = build_macro(prices)
     events = load_events()
     if not events:
-        events = SAMPLE_EVENTS
+        raise RuntimeError("No events found. Please populate events.yaml with at least one entry.")
 
     write_json("prices", prices)
     write_json("macro", macro)
